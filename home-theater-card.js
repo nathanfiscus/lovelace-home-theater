@@ -319,7 +319,7 @@ found at http://polymer.github.io/PATENTS.txt
         <div class="media-image">
           <img
             style="width:100%;"
-            src=${`background-image:url(${i.default_source_img||"/local/avr-sources/default.png"})`}
+            src=${""+(i.default_source_img||"/local/avr-sources/default.png")}
           />
           <!--<paper-progress .max=${100} .min=${0} .value=${100*t.attributes.volume_level}></paper-progress>-->
           <div class="home-theater-footer">

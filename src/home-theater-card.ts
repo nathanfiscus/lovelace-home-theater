@@ -198,8 +198,7 @@ export class HomeTheaterCard extends LitElement {
         <div class="media-image">
           <img
             style="width:100%;"
-            src=${`background-image:url(${CURRENT_CUSTOM_SOURCE_CONFIG.default_source_img ||
-              '/local/avr-sources/default.png'})`}
+            src=${`${CURRENT_CUSTOM_SOURCE_CONFIG.default_source_img || '/local/avr-sources/default.png'}`}
           />
           <!--<paper-progress .max=${100} .min=${0} .value=${entity.attributes.volume_level * 100}></paper-progress>-->
           <div class="home-theater-footer">

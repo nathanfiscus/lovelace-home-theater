@@ -1,5 +1,6 @@
 {
   "name": "Home Theater Card",
   "render_readme": true,
-  "filename": "home-theater-card.js"
+  "filename": "home-theater-card.js",
+  "content_in_root": true
 }

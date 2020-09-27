@@ -195,11 +195,12 @@ export class HomeTheaterCard extends LitElement {
 
     return html`
       <ha-card tabindex="0" aria-label=${`HomeTheater: ${this._config.entity}`}>
-        <div
-          class="media-image"
-          style=${`background-image:url(${CURRENT_CUSTOM_SOURCE_CONFIG.default_source_img ||
-            '/local/avr-sources/default.png'})`}
-        >
+        <div class="media-image">
+          <img
+            style="width:100%;"
+            src=${`background-image:url(${CURRENT_CUSTOM_SOURCE_CONFIG.default_source_img ||
+              '/local/avr-sources/default.png'})`}
+          />
           <!--<paper-progress .max=${100} .min=${0} .value=${entity.attributes.volume_level * 100}></paper-progress>-->
           <div class="home-theater-footer">
             ${this._config.name}
@@ -271,7 +272,7 @@ export class HomeTheaterCard extends LitElement {
                   ></ha-icon>
                 </mwc-icon-button>
               `}
-          <mwc-icon-button .onclick=${this.toggleMuteAVR}>
+          <mwc-icon-button .onclick=${this.toggleMuteAVR} disabled=${entity.state !== 'on'}>
             <ha-icon
               .icon=${entity.attributes.is_volume_muted ? 'mdi:volume-mute' : 'mdi:volume-high'}
               style="margin-top: -8px;"
@@ -283,6 +284,7 @@ export class HomeTheaterCard extends LitElement {
             min=${0}
             .value=${entity.attributes.volume_level * 100}
             .onchange=${this.changeAVRVolume}
+            disabled=${entity.state !== 'on'}
           ></ha-slider>
           <ha-paper-dropdown-menu label-float dynamic-align label="Sound Mode">
             <paper-listbox
@@ -343,11 +345,7 @@ export class HomeTheaterCard extends LitElement {
         align-items: center;
       }
       .media-image {
-        height: 330px;
-        background-size: contain;
         position: relative;
-        border-top-right-radius: var(--ha-card-border-radius, 4px);
-        border-top-left-radius: var(--ha-card-border-radius, 4px);
       }
       .vertical-divider {
         border-right: 1px rgba(0, 0, 0, 0.2) solid;

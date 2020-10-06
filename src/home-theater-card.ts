@@ -190,8 +190,6 @@ export class HomeTheaterCard extends LitElement {
     const tv_entity = this.hass.states[this._config.tv_entity];
     if (!entity) throw Error(`Invalid entity: ${this._config.entity}`);
 
-    console.log(entity);
-
     this.adoptStyles;
 
     const CURRENT_CUSTOM_SOURCE_CONFIG =
@@ -200,10 +198,20 @@ export class HomeTheaterCard extends LitElement {
     const SORTED_SOURCES = [...entity.attributes['source_list']].sort((a: string, b: string) => {
       const aconfig = this._config.sources.find(custom => custom.source === a);
       const bconfig = this._config.sources.find(custom => custom.source === b);
-
-      if (aconfig > bconfig) {
+      let aIndex = this._config.sources.findIndex(custom => custom.source === a);
+      let bIndex = this._config.sources.findIndex(custom => custom.source === b);
+      if (!aconfig.visible) {
+        return -1;
+      }
+      if (aIndex < 0) {
+        aIndex = 99;
+      }
+      if (bIndex < 0) {
+        bIndex = 99;
+      }
+      if (aIndex > bIndex) {
         return 1;
-      } else if (aconfig < bconfig) {
+      } else if (aIndex < bIndex) {
         return -1;
       } else {
         if (aconfig && bconfig) {
@@ -219,9 +227,6 @@ export class HomeTheaterCard extends LitElement {
         }
       }
     });
-
-    console.info(this._config.sources);
-    console.info(SORTED_SOURCES);
 
     const IS_ON = entity.state === 'on';
 
@@ -303,7 +308,7 @@ export class HomeTheaterCard extends LitElement {
                   ></ha-icon>
                 </mwc-icon-button>
               `}
-          <mwc-icon-button .onclick=${this.toggleMuteAVR} .disabled=${IS_ON}>
+          <mwc-icon-button .onclick=${this.toggleMuteAVR}>
             <ha-icon
               .icon=${entity.attributes.is_volume_muted ? 'mdi:volume-mute' : 'mdi:volume-high'}
               style="margin-top: -8px;"
@@ -315,7 +320,6 @@ export class HomeTheaterCard extends LitElement {
             min=${0}
             .value=${entity.attributes.volume_level * 100}
             .onchange=${this.changeAVRVolume}
-            .disabled=${IS_ON}
           ></ha-slider>
           <ha-paper-dropdown-menu label-float dynamic-align label="Sound Mode">
             <paper-listbox

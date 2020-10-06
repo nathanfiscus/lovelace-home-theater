@@ -111,7 +111,7 @@ export class HomeTheaterCard extends LitElement {
 
     if (CURRENT_CUSTOM_SOURCE_CONFIG.source_entity) {
       const source_entity = this.hass.states[CURRENT_CUSTOM_SOURCE_CONFIG.source_entity];
-      if (source_entity && source_entity.state !== 'on') {
+      if (source_entity && source_entity.state === 'off') {
         this.hass.callService('media_player', 'turn_on', { entity_id: source_entity.entity_id });
       } else {
         console.error(`Source Entity ${CURRENT_CUSTOM_SOURCE_CONFIG.source_entity} is not found!`);

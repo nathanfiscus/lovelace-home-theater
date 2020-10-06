@@ -166,8 +166,6 @@ export class HomeTheaterCard extends LitElement {
     const entity = this.hass.states[this._config.entity];
     if (!entity) throw Error(`Invalid entity: ${this._config.entity}`);
 
-    console.info(entity.attributes.sound_mode, value, entity.attributes.sound_mode === value);
-
     if (entity.attributes.sound_mode !== value) {
       this.hass.callService('media_player', 'select_sound_mode', {
         entity_id: entity.entity_id,
@@ -195,38 +193,38 @@ export class HomeTheaterCard extends LitElement {
     const CURRENT_CUSTOM_SOURCE_CONFIG =
       this._config.sources.find(custom => custom.source === entity.attributes.source) || {};
 
-    const SORTED_SOURCES = [...entity.attributes['source_list']].sort((a: string, b: string) => {
-      const aconfig = this._config.sources.find(custom => custom.source === a);
-      const bconfig = this._config.sources.find(custom => custom.source === b);
-      let aIndex = this._config.sources.findIndex(custom => custom.source === a);
-      let bIndex = this._config.sources.findIndex(custom => custom.source === b);
-      if (!aconfig.visible) {
-        return -1;
-      }
-      if (aIndex < 0) {
-        aIndex = 99;
-      }
-      if (bIndex < 0) {
-        bIndex = 99;
-      }
-      if (aIndex > bIndex) {
-        return 1;
-      } else if (aIndex < bIndex) {
-        return -1;
-      } else {
-        if (aconfig && bconfig) {
-          return 0;
-        } else {
-          if (a < b) {
-            return 1;
-          } else if (a > b) {
-            return -1;
-          } else {
-            return 0;
-          }
-        }
-      }
-    });
+    // const SORTED_SOURCES = [...entity.attributes['source_list']].sort((a: string, b: string) => {
+    //   const aconfig = this._config.sources.find(custom => custom.source === a);
+    //   const bconfig = this._config.sources.find(custom => custom.source === b);
+    //   let aIndex = this._config.sources.findIndex(custom => custom.source === a);
+    //   let bIndex = this._config.sources.findIndex(custom => custom.source === b);
+    //   if (!aconfig.visible) {
+    //     return -1;
+    //   }
+    //   if (aIndex < 0) {
+    //     aIndex = 99;
+    //   }
+    //   if (bIndex < 0) {
+    //     bIndex = 99;
+    //   }
+    //   if (aIndex > bIndex) {
+    //     return 1;
+    //   } else if (aIndex < bIndex) {
+    //     return -1;
+    //   } else {
+    //     if (aconfig && bconfig) {
+    //       return 0;
+    //     } else {
+    //       if (a < b) {
+    //         return 1;
+    //       } else if (a > b) {
+    //         return -1;
+    //       } else {
+    //         return 0;
+    //       }
+    //     }
+    //   }
+    // });
 
     const IS_ON = entity.state === 'on';
 
@@ -252,45 +250,30 @@ export class HomeTheaterCard extends LitElement {
               <div class="source-wrapper">
                 ${entity.state !== 'on'
                   ? ''
-                  : SORTED_SOURCES.map((s: string) => {
-                      const CUSTOM_SOURCE_CONFIG = this._config.sources.find(custom => custom.source === s);
-                      if (CUSTOM_SOURCE_CONFIG) {
-                        if (CUSTOM_SOURCE_CONFIG.visible !== false) {
-                          if (CUSTOM_SOURCE_CONFIG.icon) {
-                            return html`
-                              <mwc-icon-button
-                                .label=${CUSTOM_SOURCE_CONFIG.name || s}
-                                .onclick=${this.switchAVRSource(s)}
-                              >
-                                <ha-icon
-                                  class=${s === entity.attributes.source ? 'selected-source' : ''}
-                                  .icon=${CUSTOM_SOURCE_CONFIG.icon}
-                                  style="margin-top: -8px;"
-                                ></ha-icon>
-                              </mwc-icon-button>
-                            `;
-                          } else {
-                            return html`
-                              <button
+                  : this._config.sources.map(s => {
+                      if (s.visible !== false) {
+                        if (s.icon) {
+                          return html`
+                            <mwc-icon-button .label=${s.name} .onclick=${this.switchAVRSource(s.source)}>
+                              <ha-icon
                                 class=${s === entity.attributes.source ? 'selected-source' : ''}
-                                .onclick=${this.switchAVRSource(s)}
-                              >
-                                ${CUSTOM_SOURCE_CONFIG.name || s}
-                              </button>
-                            `;
-                          }
+                                .icon=${s.icon}
+                                style="margin-top: -8px;"
+                              ></ha-icon>
+                            </mwc-icon-button>
+                          `;
+                        } else {
+                          return html`
+                            <button
+                              class=${s === entity.attributes.source ? 'selected-source' : ''}
+                              .onclick=${this.switchAVRSource(s.source)}
+                            >
+                              ${s.name}
+                            </button>
+                          `;
                         }
-                        return null;
-                      } else {
-                        return html`
-                          <button
-                            class=${s === entity.attributes.source ? 'selected-source' : ''}
-                            .onclick=${this.switchAVRSource(s)}
-                          >
-                            ${s}
-                          </button>
-                        `;
                       }
+                      return null;
                     })}
               </div>
             </div>
@@ -308,35 +291,39 @@ export class HomeTheaterCard extends LitElement {
                   ></ha-icon>
                 </mwc-icon-button>
               `}
-          <mwc-icon-button .onclick=${this.toggleMuteAVR}>
-            <ha-icon
-              .icon=${entity.attributes.is_volume_muted ? 'mdi:volume-mute' : 'mdi:volume-high'}
-              style="margin-top: -8px;"
-            ></ha-icon>
-          </mwc-icon-button>
-          <ha-slider
-            pin
-            max=${100}
-            min=${0}
-            .value=${entity.attributes.volume_level * 100}
-            .onchange=${this.changeAVRVolume}
-          ></ha-slider>
-          <ha-paper-dropdown-menu label-float dynamic-align label="Sound Mode">
-            <paper-listbox
-              slot="dropdown-content"
-              attr-for-selected="item-name"
-              .selected=${entity.attributes.sound_mode}
-              @selected-changed=${this.handleSoundModeChange}
-            >
-              ${entity.attributes.sound_mode_list.map(
-                (mode: string) => html`
-                  <paper-item item-name=${mode}>
-                    ${mode}
-                  </paper-item>
-                `,
-              )}
-            </paper-listbox>
-          </ha-paper-dropdown-menu>
+          ${!IS_ON
+            ? ''
+            : html`
+                <mwc-icon-button .onclick=${this.toggleMuteAVR}>
+                  <ha-icon
+                    .icon=${entity.attributes.is_volume_muted ? 'mdi:volume-mute' : 'mdi:volume-high'}
+                    style="margin-top: -8px;"
+                  ></ha-icon>
+                </mwc-icon-button>
+                <ha-slider
+                  pin
+                  max=${100}
+                  min=${0}
+                  .value=${entity.attributes.volume_level * 100}
+                  .onchange=${this.changeAVRVolume}
+                ></ha-slider>
+                <ha-paper-dropdown-menu label-float dynamic-align label="Sound Mode">
+                  <paper-listbox
+                    slot="dropdown-content"
+                    attr-for-selected="item-name"
+                    .selected=${entity.attributes.sound_mode}
+                    @selected-changed=${this.handleSoundModeChange}
+                  >
+                    ${entity.attributes.sound_mode_list.map(
+                      (mode: string) => html`
+                        <paper-item item-name=${mode}>
+                          ${mode}
+                        </paper-item>
+                      `,
+                    )}
+                  </paper-listbox>
+                </ha-paper-dropdown-menu>
+              `}
         </div>
       </ha-card>
     `;
@@ -374,10 +361,14 @@ export class HomeTheaterCard extends LitElement {
         left: 0px;
         right: 0px;
         z-index: 1;
+        flex-wrap: wrap;
       }
       .control-wrapper {
         display: flex;
         align-items: center;
+        white-space: nowrap;
+        flex: 1 1 auto;
+        justify-content: space-around;
       }
       .media-image {
         position: relative;

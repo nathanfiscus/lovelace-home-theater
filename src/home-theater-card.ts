@@ -117,7 +117,7 @@ export class HomeTheaterCard extends LitElement {
         console.error(`Source Entity ${CURRENT_CUSTOM_SOURCE_CONFIG.source_entity} is not found!`);
       }
     }
-    if (entity.attributes.selected_source !== source) {
+    if (entity.attributes.source !== source) {
       this.hass.callService('media_player', 'select_source', { entity_id: entity.entity_id, source });
     }
   };

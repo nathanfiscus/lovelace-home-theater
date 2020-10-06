@@ -166,10 +166,12 @@ export class HomeTheaterCard extends LitElement {
     const entity = this.hass.states[this._config.entity];
     if (!entity) throw Error(`Invalid entity: ${this._config.entity}`);
 
-    this.hass.callService('media_player', 'select_sound_mode', {
-      entity_id: entity.entity_id,
-      sound_mode: value,
-    });
+    if (entity.attributes.sound_mode !== value) {
+      this.hass.callService('media_player', 'select_sound_mode', {
+        entity_id: entity.entity_id,
+        sound_mode: value,
+      });
+    }
   };
 
   protected render(): TemplateResult | void {
@@ -193,6 +195,29 @@ export class HomeTheaterCard extends LitElement {
     const CURRENT_CUSTOM_SOURCE_CONFIG =
       this._config.sources.find(custom => custom.source === entity.attributes.source) || {};
 
+    const SORTED_SOURCES = entity.attributes['source_list'].sort((a: string, b: string) => {
+      const aconfig = this._config.sources.find(custom => custom.source === a);
+      const bconfig = this._config.sources.find(custom => custom.source === b);
+
+      if (aconfig > bconfig) {
+        return 1;
+      } else if (aconfig < bconfig) {
+        return -1;
+      } else {
+        if (aconfig && bconfig) {
+          return 0;
+        } else {
+          if (a < b) {
+            return 1;
+          } else if (a > b) {
+            return -1;
+          } else {
+            return 0;
+          }
+        }
+      }
+    });
+
     return html`
       <ha-card tabindex="0" aria-label=${`HomeTheater: ${this._config.entity}`}>
         <div class="media-image">
@@ -215,7 +240,7 @@ export class HomeTheaterCard extends LitElement {
               <div class="source-wrapper">
                 ${entity.state !== 'on'
                   ? ''
-                  : entity.attributes['source_list'].map((s: string) => {
+                  : SORTED_SOURCES.map((s: string) => {
                       const CUSTOM_SOURCE_CONFIG = this._config.sources.find(custom => custom.source === s);
                       if (CUSTOM_SOURCE_CONFIG) {
                         if (CUSTOM_SOURCE_CONFIG.visible !== false) {
@@ -271,7 +296,7 @@ export class HomeTheaterCard extends LitElement {
                   ></ha-icon>
                 </mwc-icon-button>
               `}
-          <mwc-icon-button .onclick=${this.toggleMuteAVR} disabled=${entity.state !== 'on'}>
+          <mwc-icon-button .onclick=${this.toggleMuteAVR} disabled=${entity.state === 'off'}>
             <ha-icon
               .icon=${entity.attributes.is_volume_muted ? 'mdi:volume-mute' : 'mdi:volume-high'}
               style="margin-top: -8px;"
@@ -283,7 +308,7 @@ export class HomeTheaterCard extends LitElement {
             min=${0}
             .value=${entity.attributes.volume_level * 100}
             .onchange=${this.changeAVRVolume}
-            disabled=${entity.state !== 'on'}
+            disabled=${entity.state === 'off'}
           ></ha-slider>
           <ha-paper-dropdown-menu label-float dynamic-align label="Sound Mode">
             <paper-listbox

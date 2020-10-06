@@ -256,7 +256,7 @@ export class HomeTheaterCard extends LitElement {
                           return html`
                             <mwc-icon-button .label=${s.name} .onclick=${this.switchAVRSource(s.source)}>
                               <ha-icon
-                                class=${s === entity.attributes.source ? 'selected-source' : ''}
+                                class=${s.source === entity.attributes.source ? 'selected-source' : ''}
                                 .icon=${s.icon}
                                 style="margin-top: -8px;"
                               ></ha-icon>

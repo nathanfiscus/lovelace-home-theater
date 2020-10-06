@@ -335,7 +335,7 @@ found at http://polymer.github.io/PATENTS.txt
                 ${"on"!==t.state?"":this._config.sources.map(e=>!1!==e.visible?e.icon?H`
                             <mwc-icon-button .label=${e.name} .onclick=${this.switchAVRSource(e.source)}>
                               <ha-icon
-                                class=${e===t.attributes.source?"selected-source":""}
+                                class=${e.source===t.attributes.source?"selected-source":""}
                                 .icon=${e.icon}
                                 style="margin-top: -8px;"
                               ></ha-icon>

@@ -166,6 +166,8 @@ export class HomeTheaterCard extends LitElement {
     const entity = this.hass.states[this._config.entity];
     if (!entity) throw Error(`Invalid entity: ${this._config.entity}`);
 
+    console.info(entity.attributes.sound_mode, value, entity.attributes.sound_mode === value);
+
     if (entity.attributes.sound_mode !== value) {
       this.hass.callService('media_player', 'select_sound_mode', {
         entity_id: entity.entity_id,
@@ -195,7 +197,7 @@ export class HomeTheaterCard extends LitElement {
     const CURRENT_CUSTOM_SOURCE_CONFIG =
       this._config.sources.find(custom => custom.source === entity.attributes.source) || {};
 
-    const SORTED_SOURCES = entity.attributes['source_list'].sort((a: string, b: string) => {
+    const SORTED_SOURCES = [...entity.attributes['source_list']].sort((a: string, b: string) => {
       const aconfig = this._config.sources.find(custom => custom.source === a);
       const bconfig = this._config.sources.find(custom => custom.source === b);
 
@@ -217,6 +219,9 @@ export class HomeTheaterCard extends LitElement {
         }
       }
     });
+
+    console.info(SORTED_SOURCES);
+    console.info(entity.state, entity.state === 'on');
 
     return html`
       <ha-card tabindex="0" aria-label=${`HomeTheater: ${this._config.entity}`}>

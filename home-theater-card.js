@@ -169,7 +169,8 @@ http://polymer.github.io/AUTHORS.txt The complete set of contributors may be
 found at http://polymer.github.io/CONTRIBUTORS.txt Code distributed by Google as
 part of the polymer project is also subject to an additional IP rights grant
 found at http://polymer.github.io/PATENTS.txt
-*/const K=window.ShadowRoot&&(void 0===window.ShadyCSS||window.ShadyCSS.nativeShadow)&&"adoptedStyleSheets"in Document.prototype&&"replace"in CSSStyleSheet.prototype,Q=Symbol();class X{constructor(t,e){if(e!==Q)throw new Error("CSSResult is not constructable. Use `unsafeCSS` or `css` instead.");this.cssText=t}get styleSheet(){return void 0===this._styleSheet&&(K?(this._styleSheet=new CSSStyleSheet,this._styleSheet.replaceSync(this.cssText)):this._styleSheet=null),this._styleSheet}toString(){return this.cssText}}const tt=(t,...e)=>{const i=e.reduce((e,i,n)=>e+(t=>{if(t instanceof X)return t.cssText;if("number"==typeof t)return t;throw new Error(`Value passed to 'css' function must be a 'css' function result: ${t}. Use 'unsafeCSS' to pass non-literal values, but\n            take care to ensure page security.`)})(i)+t[n+1],t[0]);return new X(i,Q)};
+*/
+const K=window.ShadowRoot&&(void 0===window.ShadyCSS||window.ShadyCSS.nativeShadow)&&"adoptedStyleSheets"in Document.prototype&&"replace"in CSSStyleSheet.prototype,Q=Symbol();class X{constructor(t,e){if(e!==Q)throw new Error("CSSResult is not constructable. Use `unsafeCSS` or `css` instead.");this.cssText=t}get styleSheet(){return void 0===this._styleSheet&&(K?(this._styleSheet=new CSSStyleSheet,this._styleSheet.replaceSync(this.cssText)):this._styleSheet=null),this._styleSheet}toString(){return this.cssText}}const tt=(t,...e)=>{const i=e.reduce((e,i,n)=>e+(t=>{if(t instanceof X)return t.cssText;if("number"==typeof t)return t;throw new Error(`Value passed to 'css' function must be a 'css' function result: ${t}. Use 'unsafeCSS' to pass non-literal values, but\n            take care to ensure page security.`)})(i)+t[n+1],t[0]);return new X(i,Q)};
 /**
  * @license
  * Copyright (c) 2017 The Polymer Project Authors. All rights reserved.
@@ -314,17 +315,14 @@ found at http://polymer.github.io/PATENTS.txt
       ha-switch {
         padding-bottom: 8px;
       }
-    `}};t([G()],$t.prototype,"hass",void 0),t([G()],$t.prototype,"_config",void 0),t([G()],$t.prototype,"_toggle",void 0),$t=t([J("boilerplate-card-editor")],$t);var Pt={version:"Version",invalid_configuration:"Invalid configuration",show_warning:"Show Warning"},Ct={common:Pt},Et={version:"Versjon",invalid_configuration:"Ikke gyldig konfiguration",show_warning:"Vis advarsel"},Nt={common:Et},Mt={en:Object.freeze({__proto__:null,common:Pt,default:Ct}),nb:Object.freeze({__proto__:null,common:Et,default:Nt})};function Tt(t,e="",i=""){const n=(localStorage.getItem("selectedLanguage")||"en").replace(/['"]+/g,"").replace("-","_");var o;try{o=t.split(".").reduce((t,e)=>t[e],Mt[n])}catch(e){o=t.split(".").reduce((t,e)=>t[e],Mt.en)}return void 0===o&&(o=t.split(".").reduce((t,e)=>t[e],Mt.en)),""!==e&&""!==i&&(o=o.replace(e,i)),o}console.info(`%c  HOME-THEATER-CARED \n%c  ${Tt("common.version")} 1.1.13    `,"color: orange; font-weight: bold; background: black","color: white; font-weight: bold; background: dimgray"),window.customCards=window.customCards||[],window.customCards.push({type:"home-theater-card",name:"Home Theater Card",description:"A custom card for home theater systems with multiple sources"});let At=class extends it{constructor(){super(...arguments),this.togglePowerAVR=()=>{if(!this._config.entity)throw Error("Invalid entity: "+this._config.entity);const t=this.hass.states[this._config.entity];if(!t)throw Error("Invalid entity: "+this._config.entity);"on"===t.state&&this._config.sources.forEach(t=>{if(t.source_entity){const e=this.hass.states[t.source_entity];e&&"off"!==e.state?this.hass.callService("media_player","turn_off",{entity_id:e.entity_id}):console.error(`Source Entity ${t.source_entity} is not found!`)}}),this.hass.callService("media_player","toggle",{entity_id:t.entity_id})},this.switchAVRSource=t=>()=>{if(!this._config.entity)throw Error("Invalid entity: "+this._config.entity);const e=this.hass.states[this._config.entity];if(!e)throw Error("Invalid entity: "+this._config.entity);const i=this._config.sources.find(e=>e.source===t)||{};if(i.source_entity){const t=this.hass.states[i.source_entity];t&&"off"===t.state?this.hass.callService("media_player","turn_on",{entity_id:t.entity_id}):console.error(`Source Entity ${i.source_entity} is not found!`)}e.attributes.source!==t&&this.hass.callService("media_player","select_source",{entity_id:e.entity_id,source:t})},this.changeAVRVolume=t=>{const e=t.currentTarget.value;if(!this._config.entity)throw Error("Invalid entity: "+this._config.entity);const i=this.hass.states[this._config.entity];if(!i)throw Error("Invalid entity: "+this._config.entity);this.hass.callService("media_player","volume_set",{entity_id:i.entity_id,volume_level:e/100})},this.toggleTVPower=()=>{const t=this.hass.states[this._config.tv_entity];if(!t)throw Error("Invalid entity: "+this._config.tv_entity);this.hass.callService("media_player","toggle",{entity_id:t.entity_id})},this.toggleMuteAVR=()=>{if(!this._config.entity)throw Error("Invalid entity: "+this._config.entity);const t=this.hass.states[this._config.entity];if(!t)throw Error("Invalid entity: "+this._config.entity);this.hass.callService("media_player","volume_mute",{entity_id:t.entity_id,is_volume_muted:!t.attributes.is_volume_muted})},this.handleSoundModeChange=t=>{const e=t.detail.value;if(!this._config.entity)throw Error("Invalid entity: "+this._config.entity);const i=this.hass.states[this._config.entity];if(!i)throw Error("Invalid entity: "+this._config.entity);i.attributes.sound_mode!==e&&this.hass.callService("media_player","select_sound_mode",{entity_id:i.entity_id,sound_mode:e})}}static async getConfigElement(){return document.createElement("home-theater-card-editor")}static getStubConfig(){return{sources:[]}}setConfig(t){if(!t||t.show_error)throw new Error(Tt("common.invalid_configuration"));if(!t.entity)throw new Error(Tt("common.invalid_configuration"));t.test_gui&&function(){var t=document.querySelector("home-assistant");if(t=(t=(t=(t=(t=(t=(t=(t=t&&t.shadowRoot)&&t.querySelector("home-assistant-main"))&&t.shadowRoot)&&t.querySelector("app-drawer-layout partial-panel-resolver"))&&t.shadowRoot||t)&&t.querySelector("ha-panel-lovelace"))&&t.shadowRoot)&&t.querySelector("hui-root")){var e=t.lovelace;return e.current_view=t.___curView,e}return null}().setEditMode(!0),this._config=Object.assign({name:"Home Theater"},t)}shouldUpdate(){return!0}render(){if(this._config.show_warning)return this.showWarning(Tt("common.show_warning"));if(!this._config.entity)throw Error("Invalid entity: "+this._config.entity);const t=this.hass.states[this._config.entity],e=this.hass.states[this._config.tv_entity];if(!t)throw Error("Invalid entity: "+this._config.entity);this.adoptStyles;const i=this._config.sources.find(e=>e.source===t.attributes.source)||{},n="on"===t.state;return H`
+    `}};t([G()],$t.prototype,"hass",void 0),t([G()],$t.prototype,"_config",void 0),t([G()],$t.prototype,"_toggle",void 0),$t=t([J("boilerplate-card-editor")],$t);var Pt={version:"Version",invalid_configuration:"Invalid configuration",show_warning:"Show Warning"},Ct={common:Pt},Et={version:"Versjon",invalid_configuration:"Ikke gyldig konfiguration",show_warning:"Vis advarsel"},Nt={common:Et},Mt={en:Object.freeze({__proto__:null,common:Pt,default:Ct}),nb:Object.freeze({__proto__:null,common:Et,default:Nt})};function Tt(t,e="",i=""){const n=(localStorage.getItem("selectedLanguage")||"en").replace(/['"]+/g,"").replace("-","_");var o;try{o=t.split(".").reduce((t,e)=>t[e],Mt[n])}catch(e){o=t.split(".").reduce((t,e)=>t[e],Mt.en)}return void 0===o&&(o=t.split(".").reduce((t,e)=>t[e],Mt.en)),""!==e&&""!==i&&(o=o.replace(e,i)),o}console.info(`%c  HOME-THEATER-CARED \n%c  ${Tt("common.version")} 1.1.13    `,"color: orange; font-weight: bold; background: black","color: white; font-weight: bold; background: dimgray"),window.customCards=window.customCards||[],window.customCards.push({type:"home-theater-card",name:"Home Theater Card",description:"A custom card for home theater systems with multiple sources"});let At=class extends it{constructor(){super(...arguments),this.togglePowerAVR=()=>{if(!this._config.entity)throw Error("Invalid entity: "+this._config.entity);const t=this.hass.states[this._config.entity];if(!t)throw Error("Invalid entity: "+this._config.entity);"on"===t.state&&this._config.sources.forEach(t=>{if(t.source_entity){const e=this.hass.states[t.source_entity];e&&"off"!==e.state?this.hass.callService("media_player","turn_off",{entity_id:e.entity_id}):console.error(`Source Entity ${t.source_entity} is not found!`)}}),this.hass.callService("media_player","toggle",{entity_id:t.entity_id})},this.switchAVRSource=t=>()=>{if(!this._config.entity)throw Error("Invalid entity: "+this._config.entity);const e=this.hass.states[this._config.entity];if(!e)throw Error("Invalid entity: "+this._config.entity);const i=this._config.sources.find(e=>e.source===t)||{};if(i.source_entity){const t=this.hass.states[i.source_entity];t&&"off"===t.state?this.hass.callService("media_player","turn_on",{entity_id:t.entity_id}):console.error(`Source Entity ${i.source_entity} is not found!`)}e.attributes.source!==t&&this.hass.callService("media_player","select_source",{entity_id:e.entity_id,source:t})},this.changeAVRVolume=t=>{const e=t.currentTarget.value;if(!this._config.entity)throw Error("Invalid entity: "+this._config.entity);const i=this.hass.states[this._config.entity];if(!i)throw Error("Invalid entity: "+this._config.entity);this.hass.callService("media_player","volume_set",{entity_id:i.entity_id,volume_level:e/100})},this.toggleTVPower=()=>{const t=this.hass.states[this._config.tv_entity];if(!t)throw Error("Invalid entity: "+this._config.tv_entity);this.hass.callService("media_player","toggle",{entity_id:t.entity_id})},this.toggleMuteAVR=()=>{if(!this._config.entity)throw Error("Invalid entity: "+this._config.entity);const t=this.hass.states[this._config.entity];if(!t)throw Error("Invalid entity: "+this._config.entity);this.hass.callService("media_player","volume_mute",{entity_id:t.entity_id,is_volume_muted:!t.attributes.is_volume_muted})},this.handleSoundModeChange=t=>{const e=t.detail.value;if(!this._config.entity)throw Error("Invalid entity: "+this._config.entity);const i=this.hass.states[this._config.entity];if(!i)throw Error("Invalid entity: "+this._config.entity);i.attributes.sound_mode!==e&&this.hass.callService("media_player","select_sound_mode",{entity_id:i.entity_id,sound_mode:e})}}static async getConfigElement(){return document.createElement("home-theater-card-editor")}static getStubConfig(){return{sources:[]}}setConfig(t){if(!t||t.show_error)throw new Error(Tt("common.invalid_configuration"));if(!t.entity)throw new Error(Tt("common.invalid_configuration"));t.test_gui&&function(){var t=document.querySelector("home-assistant");if(t=(t=(t=(t=(t=(t=(t=(t=t&&t.shadowRoot)&&t.querySelector("home-assistant-main"))&&t.shadowRoot)&&t.querySelector("app-drawer-layout partial-panel-resolver"))&&t.shadowRoot||t)&&t.querySelector("ha-panel-lovelace"))&&t.shadowRoot)&&t.querySelector("hui-root")){var e=t.lovelace;return e.current_view=t.___curView,e}return null}().setEditMode(!0),this._config=Object.assign({name:"Home Theater"},t)}shouldUpdate(){return!0}render(){if(this._config.show_warning)return this.showWarning(Tt("common.show_warning"));if(!this._config.entity)throw Error("Invalid entity: "+this._config.entity);const t=this.hass.states[this._config.entity],e=this.hass.states[this._config.tv_entity];if(!t)throw Error("Invalid entity: "+this._config.entity);this.adoptStyles;const i=this._config.sources.find(e=>e.source===t.attributes.source)||{};let n;i.source_entity&&(n=this.hass.states[i.source_entity]);const o=""+(!(!n||"Idlescreen"===n.attributes.source)&&(n.attributes.entity_picture_local||n.attributes.entity_picture)||i.default_source_img||"/local/avr-sources/default.png"),s="on"===t.state;return H`
       <ha-card tabindex="0" aria-label=${"HomeTheater: "+this._config.entity}>
         <div class="media-image">
-          <img
-            style="width:100%;"
-            src=${""+(i.default_source_img||"/local/avr-sources/default.png")}
-          />
+          <img style="width:100%;" src=${o} />
           <!--<paper-progress .max=${100} .min=${0} .value=${100*t.attributes.volume_level}></paper-progress>-->
           <div class="home-theater-footer">
             ${this._config.name}
-            <div class="control-wrapper">
+            <div class=${("on"!==t.state?"control-wrapper-off ":"")+"control-wrapper"}>
               <mwc-icon-button label="Power" .onclick=${this.togglePowerAVR}>
                 <ha-icon icon="mdi:power" style="margin-top: -8px;"></ha-icon>
               </mwc-icon-button>
@@ -362,7 +360,7 @@ found at http://polymer.github.io/PATENTS.txt
                   ></ha-icon>
                 </mwc-icon-button>
               `:""}
-          ${n?H`
+          ${s?H`
                 <mwc-icon-button .onclick=${this.toggleMuteAVR}>
                   <ha-icon
                     .icon=${t.attributes.is_volume_muted?"mdi:volume-mute":"mdi:volume-high"}
@@ -376,7 +374,7 @@ found at http://polymer.github.io/PATENTS.txt
                   .value=${100*t.attributes.volume_level}
                   .onchange=${this.changeAVRVolume}
                 ></ha-slider>
-                <ha-paper-dropdown-menu label-float dynamic-align label="Sound Mode">
+                <!-- <ha-paper-dropdown-menu label-float dynamic-align label="Sound Mode">
                   <paper-listbox
                     slot="dropdown-content"
                     attr-for-selected="item-name"
@@ -384,12 +382,12 @@ found at http://polymer.github.io/PATENTS.txt
                     @selected-changed=${this.handleSoundModeChange}
                   >
                     ${t.attributes.sound_mode_list.map(t=>H`
-                        <paper-item item-name=${t}>
-                          ${t}
-                        </paper-item>
-                      `)}
+                    <paper-item item-name=${t}>
+                      ${t}
+                    </paper-item>
+                  `)}
                   </paper-listbox>
-                </ha-paper-dropdown-menu>
+                </ha-paper-dropdown-menu> -->
               `:""}
         </div>
       </ha-card>
@@ -418,8 +416,12 @@ found at http://polymer.github.io/PATENTS.txt
         flex: 1 1 auto;
         justify-content: space-around;
       }
+      .control-wrapper-off {
+        justify-content: flex-end !important;
+      }
       .media-image {
         position: relative;
+        text-align: center;
       }
       .vertical-divider {
         border-right: 1px rgba(0, 0, 0, 0.2) solid;
@@ -438,4 +440,4 @@ found at http://polymer.github.io/PATENTS.txt
       .selected-source {
         color: var(--paper-item-icon-active-color);
       }
-    `}};t([G()],At.prototype,"hass",void 0),t([G()],At.prototype,"_config",void 0),t([G()],At.prototype,"_configElement",void 0),At=t([J("home-theater-card")],At);export{At as HomeTheaterCard};
+    `}};t([G()],At.prototype,"hass",void 0),t([G()],At.prototype,"_config",void 0),t([G()],At.prototype,"_configElement",void 0),t([function(t){return G({attribute:!1,hasChanged:null==t?void 0:t.hasChanged})}()],At.prototype,"_source_dimensions",void 0),At=t([J("home-theater-card")],At);export{At as HomeTheaterCard};

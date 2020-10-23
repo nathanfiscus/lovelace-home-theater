@@ -1,4 +1,14 @@
-import { LitElement, html, customElement, property, CSSResult, TemplateResult, css, PropertyValues } from 'lit-element';
+import {
+  LitElement,
+  html,
+  customElement,
+  property,
+  CSSResult,
+  TemplateResult,
+  css,
+  PropertyValues,
+  internalProperty,
+} from 'lit-element';
 import {
   HomeAssistant,
   hasConfigOrEntityChanged,
@@ -49,6 +59,8 @@ export class HomeTheaterCard extends LitElement {
   @property() public hass!: HomeAssistant;
   @property() private _config!: HomeTheaterCardConfig;
   @property() private _configElement!: LovelaceCardEditor;
+
+  @internalProperty() private _source_dimensions?: any;
 
   public setConfig(config: HomeTheaterCardConfig): void {
     // TODO Check for required fields and that they are of the proper format
@@ -187,12 +199,18 @@ export class HomeTheaterCard extends LitElement {
 
     const entity = this.hass.states[this._config.entity];
     const tv_entity = this.hass.states[this._config.tv_entity];
+
     if (!entity) throw Error(`Invalid entity: ${this._config.entity}`);
 
     this.adoptStyles;
 
     const CURRENT_CUSTOM_SOURCE_CONFIG =
       this._config.sources.find(custom => custom.source === entity.attributes.source) || {};
+
+    let source_entity;
+    if (CURRENT_CUSTOM_SOURCE_CONFIG.source_entity) {
+      source_entity = this.hass.states[CURRENT_CUSTOM_SOURCE_CONFIG.source_entity];
+    }
 
     // const SORTED_SOURCES = [...entity.attributes['source_list']].sort((a: string, b: string) => {
     //   const aconfig = this._config.sources.find(custom => custom.source === a);
@@ -227,19 +245,31 @@ export class HomeTheaterCard extends LitElement {
     //   }
     // });
 
-    const IS_ON = entity.state === 'on';
+    const SOURCE_IMG = `${(source_entity && source_entity.attributes.source !== 'Idlescreen'
+      ? source_entity.attributes.entity_picture_local || source_entity.attributes.entity_picture
+      : false) ||
+      CURRENT_CUSTOM_SOURCE_CONFIG.default_source_img ||
+      '/local/avr-sources/default.png'}`;
 
+    // const img = new Image();
+    // this._source_dimensions = { w: 0, h: 0 };
+    // const _this = this;
+    // img.onload = function(): void {
+    //   _this._source_dimensions = { w: (this as HTMLImageElement).width, h: (this as HTMLImageElement).height };
+    // };
+    // img.src = SOURCE_IMG;
+
+    const IS_ON = entity.state === 'on';
+    //console.log(source_entity.attributes);
+    //console.log(this._source_dimensions);
     return html`
       <ha-card tabindex="0" aria-label=${`HomeTheater: ${this._config.entity}`}>
         <div class="media-image">
-          <img
-            style="width:100%;"
-            src=${`${CURRENT_CUSTOM_SOURCE_CONFIG.default_source_img || '/local/avr-sources/default.png'}`}
-          />
+          <img style="width:100%;" src=${SOURCE_IMG} />
           <!--<paper-progress .max=${100} .min=${0} .value=${entity.attributes.volume_level * 100}></paper-progress>-->
           <div class="home-theater-footer">
             ${this._config.name}
-            <div class="control-wrapper">
+            <div class=${(entity.state !== 'on' ? 'control-wrapper-off ' : '') + 'control-wrapper'}>
               <mwc-icon-button label="Power" .onclick=${this.togglePowerAVR}>
                 <ha-icon icon="mdi:power" style="margin-top: -8px;"></ha-icon>
               </mwc-icon-button>
@@ -308,7 +338,7 @@ export class HomeTheaterCard extends LitElement {
                   .value=${entity.attributes.volume_level * 100}
                   .onchange=${this.changeAVRVolume}
                 ></ha-slider>
-                <ha-paper-dropdown-menu label-float dynamic-align label="Sound Mode">
+                <!-- <ha-paper-dropdown-menu label-float dynamic-align label="Sound Mode">
                   <paper-listbox
                     slot="dropdown-content"
                     attr-for-selected="item-name"
@@ -316,14 +346,14 @@ export class HomeTheaterCard extends LitElement {
                     @selected-changed=${this.handleSoundModeChange}
                   >
                     ${entity.attributes.sound_mode_list.map(
-                      (mode: string) => html`
-                        <paper-item item-name=${mode}>
-                          ${mode}
-                        </paper-item>
-                      `,
-                    )}
+                  (mode: string) => html`
+                    <paper-item item-name=${mode}>
+                      ${mode}
+                    </paper-item>
+                  `,
+                )}
                   </paper-listbox>
-                </ha-paper-dropdown-menu>
+                </ha-paper-dropdown-menu> -->
               `}
         </div>
       </ha-card>
@@ -371,8 +401,12 @@ export class HomeTheaterCard extends LitElement {
         flex: 1 1 auto;
         justify-content: space-around;
       }
+      .control-wrapper-off {
+        justify-content: flex-end !important;
+      }
       .media-image {
         position: relative;
+        text-align: center;
       }
       .vertical-divider {
         border-right: 1px rgba(0, 0, 0, 0.2) solid;
